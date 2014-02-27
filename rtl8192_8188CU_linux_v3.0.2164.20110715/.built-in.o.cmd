@@ -1,0 +1,1 @@
+cmd_/home/ndao/svn/dev/dev/build/linux-drivers/rtl8192_8188CU_linux_v3.0.2164.20110715/built-in.o :=  rm -f /home/ndao/svn/dev/dev/build/linux-drivers/rtl8192_8188CU_linux_v3.0.2164.20110715/built-in.o; arm-angstrom-linux-gnueabi-ar rcs /home/ndao/svn/dev/dev/build/linux-drivers/rtl8192_8188CU_linux_v3.0.2164.20110715/built-in.o
