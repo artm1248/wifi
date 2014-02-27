@@ -55,7 +55,7 @@ get_info(int			skfd,
     {
         /* If no wireless name : no wireless extensions */
         /* But let's check if the interface exists at all */
-        struct ifreq ifr;
+        struct ifreq ifr = {};
 
         strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
         if(ioctl(skfd, SIOCGIFFLAGS, &ifr) < 0)
@@ -157,13 +157,13 @@ get_info(int			skfd,
  * on a device.
  */
 static void
-display_info(struct wireless_info *	info,
-             char *			ifname)
+display_info(struct wireless_info *info,
+             char *ifname)
 {
-    char		buffer[128];	/* Temporary buffer */
+    char	buffer[128];	/* Temporary buffer */
 
     /* One token is more of less 5 characters, 14 tokens per line */
-    int	tokens = 3;	/* For name */
+    int tokens = 3;	/* For name */
 
     /* Display device name and wireless name (name of the protocol used) */
     printf("%-8.16s  %s  ", ifname, info->b.name);
@@ -514,9 +514,9 @@ print_info(int		skfd,
  */
 typedef struct iwconfig_modifier
 {
-    const char *		cmd;		/* Command line shorthand */
-    __u16			flag;		/* Flags to add */
-    __u16			exclude;	/* Modifiers to exclude */
+    const char *cmd;		/* Command line shorthand */
+    __u16       flag;		/* Flags to add */
+    __u16       exclude;	         /* Modifiers to exclude */
 } iwconfig_modifier;
 
 /*------------------------------------------------------------------*/
@@ -704,8 +704,8 @@ set_essid_info(int		skfd,
  */
 static int
 set_mode_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -742,8 +742,8 @@ set_mode_info(int		skfd,
  */
 static int
 set_freq_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -892,8 +892,8 @@ set_bitrate_info(int		skfd,
  */
 static int
 set_enc_info(int		skfd,
-             char *		ifname,
-             char *		args[],		/* Command line args */
+             char *	ifname,
+             char *	args[],		/* Command line args */
              int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1120,8 +1120,8 @@ set_power_info(int		skfd,
  */
 static int
 set_nick_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1156,8 +1156,8 @@ set_nick_info(int		skfd,
  */
 static int
 set_nwid_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1367,8 +1367,8 @@ set_txpower_info(int		skfd,
  */
 static int
 set_sens_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1465,8 +1465,8 @@ set_retry_info(int		skfd,
  */
 static int
 set_rts_info(int		skfd,
-             char *		ifname,
-             char *		args[],		/* Command line args */
+             char *	ifname,
+             char *	args[],		/* Command line args */
              int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1517,8 +1517,8 @@ set_rts_info(int		skfd,
  */
 static int
 set_frag_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1570,8 +1570,8 @@ set_frag_info(int		skfd,
  */
 static int
 set_modulation_info(int		skfd,
-                    char *	ifname,
-                    char *	args[],		/* Command line args */
+                    char            *ifname,
+                    char            *args[],		/* Command line args */
                     int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1948,7 +1948,7 @@ iw_usage(void)
  */
 int
 main(int	argc,
-     char **	argv)
+     char **argv)
 {
     int skfd;		/* generic raw socket desc.	*/
     int goterr = 0;
