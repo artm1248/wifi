@@ -1689,12 +1689,12 @@ set_commit_info(int		skfd,
  */
 typedef struct iwconfig_entry
 {
-    const char *		cmd;		/* Command line shorthand */
-    iw_enum_handler	fn;		/* Subroutine */
-    int			min_count;
-    int			request;	/* WE numerical ID */
-    const char *		name;		/* Human readable string */
-    const char *		argsname;	/* Args as human readable string */
+    const char  		*cmd;		/* Command line shorthand */
+    iw_enum_handler	    fn;		    /* Subroutine */
+    int			        min_count;
+    int			        request;	/* WE numerical ID */
+    const char  		*name;		/* Human readable string */
+    const char  		*argsname;	/* Args as human readable string */
 } iwconfig_cmd;
 
 static const struct iwconfig_entry iwconfig_cmds[] =
@@ -1704,11 +1704,11 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set ESSID",			"{NNN|any|on|off}"
     },
     {
-        "mode",		set_mode_info,		1,	SIOCSIWMODE,
+        "mode",		    set_mode_info,		1,	SIOCSIWMODE,
         "Set Mode",			"{managed|ad-hoc|master|...}"
     },
     {
-        "freq",		set_freq_info,		1,	SIOCSIWFREQ,
+        "freq",		    set_freq_info,		1,	SIOCSIWFREQ,
         "Set Frequency",		"N.NNN[k|M|G]"
     },
     {
@@ -1716,19 +1716,19 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set Frequency",		"N"
     },
     {
-        "bit",		set_bitrate_info,	1,	SIOCSIWRATE,
+        "bit",		    set_bitrate_info,	1,	SIOCSIWRATE,
         "Set Bit Rate",			"{N[k|M|G]|auto|fixed}"
     },
     {
-        "rate",		set_bitrate_info,	1,	SIOCSIWRATE,
+        "rate",		    set_bitrate_info,	1,	SIOCSIWRATE,
         "Set Bit Rate",			"{N[k|M|G]|auto|fixed}"
     },
     {
-        "enc",		set_enc_info,		1,	SIOCSIWENCODE,
+        "enc",		    set_enc_info,		1,	SIOCSIWENCODE,
         "Set Encode",			"{NNNN-NNNN|off}"
     },
     {
-        "key",		set_enc_info,		1,	SIOCSIWENCODE,
+        "key",		    set_enc_info,		1,	SIOCSIWENCODE,
         "Set Encode",			"{NNNN-NNNN|off}"
     },
     {
@@ -1741,11 +1741,11 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set Nickname",			"NNN"
     },
     {
-        "nwid",		set_nwid_info,		1,	SIOCSIWNWID,
+        "nwid",		    set_nwid_info,		1,	SIOCSIWNWID,
         "Set NWID",			"{NN|on|off}"
     },
     {
-        "ap",		set_apaddr_info,	1,	SIOCSIWAP,
+        "ap",		    set_apaddr_info,	1,	SIOCSIWAP,
         "Set AP Address",		"{N|off|auto}"
     },
     {
@@ -1753,7 +1753,7 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set Tx Power",			"{NmW|NdBm|off|auto}"
     },
     {
-        "sens",		set_sens_info,		1,	SIOCSIWSENS,
+        "sens",		    set_sens_info,		1,	SIOCSIWSENS,
         "Set Sensitivity",		"N"
     },
     {
@@ -1761,11 +1761,11 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set Retry Limit",		"{limit N|lifetime N}"
     },
     {
-        "rts",		set_rts_info,		1,	SIOCSIWRTS,
+        "rts",		    set_rts_info,		1,	SIOCSIWRTS,
         "Set RTS Threshold",		"{N|auto|fixed|off}"
     },
     {
-        "frag",		set_frag_info,		1,	SIOCSIWFRAG,
+        "frag",		    set_frag_info,		1,	SIOCSIWFRAG,
         "Set Fragmentation Threshold",	"{N|auto|fixed|off}"
     },
     {
