@@ -55,7 +55,7 @@ get_info(int			skfd,
     {
         /* If no wireless name : no wireless extensions */
         /* But let's check if the interface exists at all */
-        struct ifreq ifr;
+        struct ifreq ifr = {};
 
         strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
         if(ioctl(skfd, SIOCGIFFLAGS, &ifr) < 0)
@@ -157,13 +157,13 @@ get_info(int			skfd,
  * on a device.
  */
 static void
-display_info(struct wireless_info *	info,
-             char *			ifname)
+display_info(struct wireless_info *info,
+             char *ifname)
 {
-    char		buffer[128];	/* Temporary buffer */
+    char	buffer[128];	/* Temporary buffer */
 
     /* One token is more of less 5 characters, 14 tokens per line */
-    int	tokens = 3;	/* For name */
+    int tokens = 3;	/* For name */
 
     /* Display device name and wireless name (name of the protocol used) */
     printf("%-8.16s  %s  ", ifname, info->b.name);
@@ -514,9 +514,9 @@ print_info(int		skfd,
  */
 typedef struct iwconfig_modifier
 {
-    const char *		cmd;		/* Command line shorthand */
-    __u16			flag;		/* Flags to add */
-    __u16			exclude;	/* Modifiers to exclude */
+    const char *cmd;		/* Command line shorthand */
+    __u16       flag;		/* Flags to add */
+    __u16       exclude;	         /* Modifiers to exclude */
 } iwconfig_modifier;
 
 /*------------------------------------------------------------------*/
@@ -704,8 +704,8 @@ set_essid_info(int		skfd,
  */
 static int
 set_mode_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -742,8 +742,8 @@ set_mode_info(int		skfd,
  */
 static int
 set_freq_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -892,8 +892,8 @@ set_bitrate_info(int		skfd,
  */
 static int
 set_enc_info(int		skfd,
-             char *		ifname,
-             char *		args[],		/* Command line args */
+             char *	ifname,
+             char *	args[],		/* Command line args */
              int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1120,8 +1120,8 @@ set_power_info(int		skfd,
  */
 static int
 set_nick_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1156,8 +1156,8 @@ set_nick_info(int		skfd,
  */
 static int
 set_nwid_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1367,8 +1367,8 @@ set_txpower_info(int		skfd,
  */
 static int
 set_sens_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1465,8 +1465,8 @@ set_retry_info(int		skfd,
  */
 static int
 set_rts_info(int		skfd,
-             char *		ifname,
-             char *		args[],		/* Command line args */
+             char *	ifname,
+             char *	args[],		/* Command line args */
              int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1517,8 +1517,8 @@ set_rts_info(int		skfd,
  */
 static int
 set_frag_info(int		skfd,
-              char *		ifname,
-              char *		args[],		/* Command line args */
+              char *	ifname,
+              char *	args[],		/* Command line args */
               int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1570,8 +1570,8 @@ set_frag_info(int		skfd,
  */
 static int
 set_modulation_info(int		skfd,
-                    char *	ifname,
-                    char *	args[],		/* Command line args */
+                    char            *ifname,
+                    char            *args[],		/* Command line args */
                     int		count)		/* Args count */
 {
     struct iwreq		wrq;
@@ -1689,12 +1689,12 @@ set_commit_info(int		skfd,
  */
 typedef struct iwconfig_entry
 {
-    const char *		cmd;		/* Command line shorthand */
-    iw_enum_handler	fn;		/* Subroutine */
-    int			min_count;
-    int			request;	/* WE numerical ID */
-    const char *		name;		/* Human readable string */
-    const char *		argsname;	/* Args as human readable string */
+    const char  		*cmd;		/* Command line shorthand */
+    iw_enum_handler	    fn;		    /* Subroutine */
+    int			        min_count;
+    int			        request;	/* WE numerical ID */
+    const char  		*name;		/* Human readable string */
+    const char  		*argsname;	/* Args as human readable string */
 } iwconfig_cmd;
 
 static const struct iwconfig_entry iwconfig_cmds[] =
@@ -1704,11 +1704,11 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set ESSID",			"{NNN|any|on|off}"
     },
     {
-        "mode",		set_mode_info,		1,	SIOCSIWMODE,
+        "mode",		    set_mode_info,		1,	SIOCSIWMODE,
         "Set Mode",			"{managed|ad-hoc|master|...}"
     },
     {
-        "freq",		set_freq_info,		1,	SIOCSIWFREQ,
+        "freq",		    set_freq_info,		1,	SIOCSIWFREQ,
         "Set Frequency",		"N.NNN[k|M|G]"
     },
     {
@@ -1716,19 +1716,19 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set Frequency",		"N"
     },
     {
-        "bit",		set_bitrate_info,	1,	SIOCSIWRATE,
+        "bit",		    set_bitrate_info,	1,	SIOCSIWRATE,
         "Set Bit Rate",			"{N[k|M|G]|auto|fixed}"
     },
     {
-        "rate",		set_bitrate_info,	1,	SIOCSIWRATE,
+        "rate",		    set_bitrate_info,	1,	SIOCSIWRATE,
         "Set Bit Rate",			"{N[k|M|G]|auto|fixed}"
     },
     {
-        "enc",		set_enc_info,		1,	SIOCSIWENCODE,
+        "enc",		    set_enc_info,		1,	SIOCSIWENCODE,
         "Set Encode",			"{NNNN-NNNN|off}"
     },
     {
-        "key",		set_enc_info,		1,	SIOCSIWENCODE,
+        "key",		    set_enc_info,		1,	SIOCSIWENCODE,
         "Set Encode",			"{NNNN-NNNN|off}"
     },
     {
@@ -1741,11 +1741,11 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set Nickname",			"NNN"
     },
     {
-        "nwid",		set_nwid_info,		1,	SIOCSIWNWID,
+        "nwid",		    set_nwid_info,		1,	SIOCSIWNWID,
         "Set NWID",			"{NN|on|off}"
     },
     {
-        "ap",		set_apaddr_info,	1,	SIOCSIWAP,
+        "ap",		    set_apaddr_info,	1,	SIOCSIWAP,
         "Set AP Address",		"{N|off|auto}"
     },
     {
@@ -1753,7 +1753,7 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set Tx Power",			"{NmW|NdBm|off|auto}"
     },
     {
-        "sens",		set_sens_info,		1,	SIOCSIWSENS,
+        "sens",		    set_sens_info,		1,	SIOCSIWSENS,
         "Set Sensitivity",		"N"
     },
     {
@@ -1761,11 +1761,11 @@ static const struct iwconfig_entry iwconfig_cmds[] =
         "Set Retry Limit",		"{limit N|lifetime N}"
     },
     {
-        "rts",		set_rts_info,		1,	SIOCSIWRTS,
+        "rts",		    set_rts_info,		1,	SIOCSIWRTS,
         "Set RTS Threshold",		"{N|auto|fixed|off}"
     },
     {
-        "frag",		set_frag_info,		1,	SIOCSIWFRAG,
+        "frag",		    set_frag_info,		1,	SIOCSIWFRAG,
         "Set Fragmentation Threshold",	"{N|auto|fixed|off}"
     },
     {
@@ -1948,7 +1948,7 @@ iw_usage(void)
  */
 int
 main(int	argc,
-     char **	argv)
+     char **argv)
 {
     int skfd;		/* generic raw socket desc.	*/
     int goterr = 0;
