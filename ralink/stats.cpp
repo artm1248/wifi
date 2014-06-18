@@ -20,26 +20,17 @@ static const unsigned int RTPRIV_IOCTL_SHOW_CFG_VALUE = 21;
 static char CFG_VALUE_WIRELESS_MODE[] = "WirelessMode";
 static char CFG_VALUE_CHANNEL[] = "Channel";
 
-/** Max legal signal power.
- */
-static const unsigned MAX_POWER_DBM = 64;
-
-/** Max RSSI range.
- */
-static const unsigned MAX_RSSI_RANGE = 256;
- 
-/** Thermal noise floor.
- */
-static const unsigned NOISE_FLOOR_DBM = -192;
 
 int skfd; // Generic raw socket desc.
 
-bool GetWifiBssid( char bssid[] );
-bool GetWifiChannel( unsigned short& wireless_channel );
-bool GetWifiLinkSpeed( unsigned int& link_speed );
-bool GetWifiLinkQual( unsigned int& link_qual, int& rssi );
-bool GetWifiMode( char wireless_mode[] );
 
+/** GetWifiMode.
+ *  @param wireless_mode - char buffer to store wireless mode info.
+ *  @return true if successful, false otherwise.
+ *  Notes: 
+ *      - Use Ralink RTPRIV_IOCTL_SHOW ioctl, flag 21, command string "WirelessMode".
+ *      - Buffer must be at least WIRELESS_MODE_LEN size.
+ */
 bool GetWifiMode( char wireless_mode[] )
 {
     // Declare a iwreq struct to get info from the kernel.
@@ -68,6 +59,12 @@ bool GetWifiMode( char wireless_mode[] )
 }
 
 
+/** GetWifiChannel.
+ *  @param wireless_channel - to store the wireless channel.
+ *  @return true if successful, false otherwise.
+ *  Notes:
+ *      - Use Ralink RTPRIV_IOCTL_SHOW ioctl, flag 21, command string "Channel".
+ */
 bool GetWifiChannel( unsigned short& wireless_channel )
 {
     // Declare a iwreq struct to get info from the kernel.
@@ -96,6 +93,13 @@ bool GetWifiChannel( unsigned short& wireless_channel )
     return true;
 }
 
+
+/** GetWifiBssid.
+ *  @param bssid - char buffer to store the BSSID.
+ *  @return true if successful, false otherwise.
+ *  Notes:
+ *      - Use SIOCGIWAP (standard ioctl).
+ */ 
 bool GetWifiBssid( char bssid[] )
 {
     // Declare a iwreq struct to get info from the kernel.
@@ -117,6 +121,14 @@ bool GetWifiBssid( char bssid[] )
     return true;
 }
 
+
+/** GetWifiLinkSpeed.
+ *  @param link_speed - reference to unsigned int to store link speed.
+ *  @return true if successful, false otherwise.
+ *  Notes:
+ *      - Use SIOCGIWRATE (standard ioctl).
+ *      - Link speed is in Mbps.
+ */
 bool GetWifiLinkSpeed( unsigned int& link_speed )
 {
     // Declare a iwreq struct to get info from the kernel.
@@ -139,7 +151,17 @@ bool GetWifiLinkSpeed( unsigned int& link_speed )
     return true;
 }
 
-bool GetWifiLinkQual( unsigned int& link_qual, int& rssi )
+
+/** GetWifiLinkQual.
+ *  @param link_qual - to store link qualily.
+ *  @param rssi - to store RSSI.
+ *  @return true if successful, false otherwise.
+ *  Notes:
+ *      - Use SIOCGIWSTATS (standard ioctl).
+ *      - Link quality is between 0 to 100.
+ *      - Rssi is in dBm.
+ */
+bool GetWifiLinkQual( unsigned short& link_qual, int& rssi )
 { 
     // Declare a iwreq struct to get info from the kernel.
     struct iwreq request = {};
@@ -160,11 +182,14 @@ bool GetWifiLinkQual( unsigned int& link_qual, int& rssi )
     else
     {
         // Convert to dBm.
+        const unsigned short MAX_POWER_DBM = 64;
+        const unsigned short MAX_RSSI_RANGE = 256;
+
         struct iw_quality qual = {};
         qual = stats.qual;
         int dblevel = qual.level;
 
-        if( ( qual.updated & IW_QUAL_DBM ) /*|| ( qual.level > range.max_qual.level )*/ )
+        if( qual.updated & IW_QUAL_DBM )
         {
             // Signal level in dBm.
             if( !( qual.updated & IW_QUAL_LEVEL_INVALID ) )
@@ -191,33 +216,32 @@ int main()
     skfd = socket( AF_INET, SOCK_DGRAM, 0 );
     if( 0 > skfd )
     {
-          perror( "Error creating socket.\n" );
-          exit( -1 );
+          perror( "Error: Failed to create socket.\n" );
+          return -1;
     } 
 
-    // Now we have the data (from driver/kernel) built into wrq struct, go get it.
-    char wireless_mode[WIRELESS_MODE_LEN + 1];
+    char wireless_mode[WIRELESS_MODE_LEN + 1] = "";
     if( !( GetWifiMode( wireless_mode ) ) )
     {
-        printf( "Failed to get client MAC address.\n" );
+        printf( "Error: Failed to get Wireless mode.\n" );
         return -1;
     }
-    printf( "Wireless Mode = %s \n", wireless_mode );
+    printf( "Wireless mode = %s \n", wireless_mode );
 
 
     unsigned short wireless_channel = 0;
     if( !( GetWifiChannel( wireless_channel ) ) )
     {
-        printf( "Failed to get client MAC address.\n" );
+        printf( "Error: Failed to get Wireless channel.\n" );
         return -1;
     }
-    printf( "Wireless Channel = %u \n", wireless_channel );
+    printf( "Wireless channel = %u \n", wireless_channel );
 
 
     char bssid[MAC_ADDR_LEN] = "";
     if( !( GetWifiBssid( bssid ) ) )
     {
-        printf( "Failed to get BSSID.\n" );
+        printf( "Error: Failed to get BSSID.\n" );
         return -1;
     }
     printf( "BSSID = " MACADDR "\n", DEREF_MACADDR( bssid ) );
@@ -226,7 +250,7 @@ int main()
     unsigned int link_speed = 0;
     if( !( GetWifiLinkSpeed( link_speed ) ) )
     {
-        printf( "Failed to get Link speed.\n" );
+        printf( "Error: Failed to get Link speed.\n" );
         return -1;
     }
     printf( "Link speed = %u \n", link_speed );
@@ -236,7 +260,7 @@ int main()
     int rssi = 0;
     if( !( GetWifiLinkQual( link_qual, rssi ) ) )
     {
-        printf( "Failed to get Link quality.\n" );
+        printf( "Error: Failed to get Link quality.\n" );
         return -1;
     }
     printf( "Link quality = %u, Rssi = %d \n", link_qual, rssi );
