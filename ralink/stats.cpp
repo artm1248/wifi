@@ -27,7 +27,7 @@ static const unsigned MAX_POWER_DBM = 64;
 /** Max RSSI range.
  */
 static const unsigned MAX_RSSI_RANGE = 256;
-
+ 
 /** Thermal noise floor.
  */
 static const unsigned NOISE_FLOOR_DBM = -192;
@@ -35,9 +35,9 @@ static const unsigned NOISE_FLOOR_DBM = -192;
 int skfd; // Generic raw socket desc.
 
 bool GetWifiBssid( char bssid[] );
-bool GetWifiChannel( unsigned short* wireless_channel );
-bool GetWifiLinkSpeed( unsigned int* link_speed );
-bool GetWifiLinkQual( unsigned int* link_qual, int* rssi );
+bool GetWifiChannel( unsigned short& wireless_channel );
+bool GetWifiLinkSpeed( unsigned int& link_speed );
+bool GetWifiLinkQual( unsigned int& link_qual, int& rssi );
 bool GetWifiMode( char wireless_mode[] );
 
 bool GetWifiMode( char wireless_mode[] )
@@ -68,7 +68,7 @@ bool GetWifiMode( char wireless_mode[] )
 }
 
 
-bool GetWifiChannel( unsigned short* wireless_channel )
+bool GetWifiChannel( unsigned short& wireless_channel )
 {
     // Declare a iwreq struct to get info from the kernel.
     struct iwreq request = {};
@@ -90,8 +90,8 @@ bool GetWifiChannel( unsigned short* wireless_channel )
     }
     else
     {
-        *wireless_channel = atoi( wireless_channel_buf );
-        printf( "GetWifiChannel: Wireless Channel = %u \n", *wireless_channel );
+        wireless_channel = atoi( wireless_channel_buf );
+        printf( "GetWifiChannel: Wireless Channel = %u \n", wireless_channel );
     }
     return true;
 }
@@ -117,7 +117,7 @@ bool GetWifiBssid( char bssid[] )
     return true;
 }
 
-bool GetWifiLinkSpeed( unsigned int* link_speed )
+bool GetWifiLinkSpeed( unsigned int& link_speed )
 {
     // Declare a iwreq struct to get info from the kernel.
     struct iwreq request = {};
@@ -132,14 +132,14 @@ bool GetWifiLinkSpeed( unsigned int* link_speed )
     }
     else
     {
-        memcpy( link_speed, &request.u.bitrate, sizeof( int ) );
-        *link_speed /= 1000000; // Mbps
-        printf( "GetWifiLinkSpeed: Link speed = %u (Mbps)\n", *link_speed );
+        memcpy( &link_speed, &request.u.bitrate, sizeof( int ) );
+        link_speed /= 1000000; // Mbps
+        printf( "GetWifiLinkSpeed: Link speed = %u (Mbps)\n", link_speed );
     }
     return true;
 }
 
-bool GetWifiLinkQual( unsigned int* link_qual, int* rssi )
+bool GetWifiLinkQual( unsigned int& link_qual, int& rssi )
 { 
     // Declare a iwreq struct to get info from the kernel.
     struct iwreq request = {};
@@ -176,9 +176,9 @@ bool GetWifiLinkQual( unsigned int* link_qual, int* rssi )
             }
         }
 
-        *rssi = dblevel;
-        *link_qual = stats.qual.qual;
-        printf( "GetWifiLinkQual: Link quality = %u, Rssi = %d\n", *link_qual, *rssi );
+        rssi = dblevel;
+        link_qual = stats.qual.qual;
+        printf( "GetWifiLinkQual: Link quality = %u, Rssi = %d\n", link_qual, rssi );
     }
 
     return true;
@@ -206,7 +206,7 @@ int main()
 
 
     unsigned short wireless_channel = 0;
-    if( !( GetWifiChannel( &wireless_channel ) ) )
+    if( !( GetWifiChannel( wireless_channel ) ) )
     {
         printf( "Failed to get client MAC address.\n" );
         return -1;
@@ -224,7 +224,7 @@ int main()
 
 
     unsigned int link_speed = 0;
-    if( !( GetWifiLinkSpeed( &link_speed ) ) )
+    if( !( GetWifiLinkSpeed( link_speed ) ) )
     {
         printf( "Failed to get Link speed.\n" );
         return -1;
@@ -234,7 +234,7 @@ int main()
 
     unsigned int link_qual = 0;
     int rssi = 0;
-    if( !( GetWifiLinkQual( &link_qual, &rssi ) ) )
+    if( !( GetWifiLinkQual( link_qual, rssi ) ) )
     {
         printf( "Failed to get Link quality.\n" );
         return -1;
