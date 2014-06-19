@@ -29,7 +29,7 @@ int skfd; // Generic raw socket desc.
  *  @return true if successful, false otherwise.
  *  Notes: 
  *      - Use Ralink RTPRIV_IOCTL_SHOW ioctl, flag 21, command string "WirelessMode".
- *      - Buffer must be at least WIRELESS_MODE_LEN size.
+ *      - Buffer size must be at least WIRELESS_MODE_LEN + 1.
  */
 bool GetWifiMode( char wireless_mode[] )
 {
@@ -210,6 +210,39 @@ bool GetWifiLinkQual( unsigned short& link_qual, int& rssi )
 } 
 
 
+/** GetWifiProtocol.
+ *  @param protocol - char buffer to store the WiFi protocols supported by the wireless chipset.
+ *  @return true if successful, false otherwise.
+ *  Notes:
+ *      - Use SIOCGIWNAME (standard ioctl).
+ *      - Buffer size must be at least WIRELESS_MODE_LEN + 1.
+ */
+bool GetWifiProtocol( char protocol[] )
+{
+    // Declare a iwreq struct to get info from the kernel.
+    struct iwreq request = {};
+    // Assign interface name.
+    strcpy( request.ifr_name, INTF_NAME_RA0 );
+
+    // Fill in request for Wifi channel.
+    request.u.data.pointer = protocol;
+    request.u.data.length  = sizeof( WIRELESS_MODE_LEN + 1 );
+
+    int ret = ioctl( skfd, SIOCGIWNAME , &request );
+    if( 0 > ret )
+    {
+        printf( "GetWifiProtocol: SIOCGIWNAME failed code %d.\n", ret );
+        return false;
+    }
+    else
+    {
+        strncpy( protocol, request.u.name, IFNAMSIZ );
+        printf( "GetWifiProtocol: Protocol = %s \n", protocol );
+    }
+    return true;
+}
+
+
 int main()
 { 
     // Create a socket to communicate with the kernel.  
@@ -256,7 +289,7 @@ int main()
     printf( "Link speed = %u \n", link_speed );
 
 
-    unsigned int link_qual = 0;
+    unsigned short link_qual = 0;
     int rssi = 0;
     if( !( GetWifiLinkQual( link_qual, rssi ) ) )
     {
@@ -264,6 +297,15 @@ int main()
         return -1;
     }
     printf( "Link quality = %u, Rssi = %d \n", link_qual, rssi );
+
+
+    char protocol[WIRELESS_MODE_LEN + 1 ] = "";
+    if( !( GetWifiProtocol( protocol ) ) )
+    {
+        printf( "Error: Failed to get Wireless protocol.\n" );
+        return -1;
+    }
+    printf( "Wireless protocol = %s \n", protocol );
 
 
     // Work done, now close the socket.
