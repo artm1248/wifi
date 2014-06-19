@@ -11,12 +11,13 @@
 #define DEREF_MACADDR(x) (char)((x)[0]), (char)((x)[1]), (char)((x)[2]), (char)((x)[3]), (char)((x)[4]), (char)((x)[5])
 
 #define MAC_ADDR_LEN        6
-#define WIRELESS_MODE_LEN   12  // 11A/B/G/N/AC
-#define CHANNEL_LEN         3   // 165
+#define WIRELESS_MODE_LEN   30
+#define CHANNEL_LEN         3
 
 static const char INTF_NAME_RA0[] = "ra0";
 static const unsigned int RTPRIV_IOCTL_SHOW = SIOCIWFIRSTPRIV + 0x11;
 static const unsigned int RTPRIV_IOCTL_SHOW_CFG_VALUE = 21;
+static char CFG_VALUE_AP_MODE[] = "APMode";
 static char CFG_VALUE_WIRELESS_MODE[] = "WirelessMode";
 static char CFG_VALUE_CHANNEL[] = "Channel";
 
@@ -27,8 +28,9 @@ int skfd; // Generic raw socket desc.
 /** GetWifiMode.
  *  @param wireless_mode - char buffer to store wireless mode info.
  *  @return true if successful, false otherwise.
- *  Notes: 
+ *  Notes:
  *      - Use Ralink RTPRIV_IOCTL_SHOW ioctl, flag 21, command string "WirelessMode".
+ *      - This ioctl only provides the wireless modes supported by the client wireless chipset (NOT the AP mode).
  *      - Buffer size must be at least WIRELESS_MODE_LEN + 1.
  */
 bool GetWifiMode( char wireless_mode[] )
@@ -54,6 +56,41 @@ bool GetWifiMode( char wireless_mode[] )
     else
     {
         printf( "GetWifiMode: WirelessMode = %s \n", wireless_mode);
+    }
+    return true;
+}
+
+
+/** GetAPMode.
+ *  @param ap_mode - char buffer to store wireless mode info.
+ *  @return true if successful, false otherwise.
+ *  Notes:
+ *      - Use Ralink RTPRIV_IOCTL_SHOW ioctl, flag 21, command string "APMode".
+ *      - Buffer size must be at least WIRELESS_MODE_LEN + 1.
+ */
+bool GetAPMode( char ap_mode[] )
+{
+    // Declare a iwreq struct to get info from the kernel.
+    struct iwreq request = {};
+    // Assign interface name.
+    strcpy( request.ifr_name, INTF_NAME_RA0 );
+
+    // Fill in request for Wifi mode.
+    memset( ap_mode, 0, sizeof( ap_mode ) );
+    request.u.data.pointer = ap_mode;
+    strcpy( ap_mode, CFG_VALUE_AP_MODE );     // Same user buffer for command and response.
+    request.u.data.length  = sizeof( ap_mode );
+    request.u.data.flags   = RTPRIV_IOCTL_SHOW_CFG_VALUE;
+
+    int ret = ioctl( skfd, RTPRIV_IOCTL_SHOW, &request );
+    if( 0 > ret )
+    {
+        printf( "GetAPMode: Get ioctl failed code %d.\n", ret );
+        return false;
+    }
+    else
+    {
+        printf( "GetAPMode: APMode = %s \n", ap_mode);
     }
     return true;
 }
@@ -215,6 +252,7 @@ bool GetWifiLinkQual( unsigned short& link_qual, int& rssi )
  *  @return true if successful, false otherwise.
  *  Notes:
  *      - Use SIOCGIWNAME (standard ioctl).
+ *      - This ioctl only provides the wireless modes supported by the client wireless chipset (NOT the AP mode).
  *      - Buffer size must be at least WIRELESS_MODE_LEN + 1.
  */
 bool GetWifiProtocol( char protocol[] )
@@ -306,6 +344,15 @@ int main()
         return -1;
     }
     printf( "Wireless protocol = %s \n", protocol );
+
+
+    char ap_mode[WIRELESS_MODE_LEN + 1 ] = "";
+    if( !( GetAPMode( ap_mode ) ) )
+    {
+        printf( "Error: Failed to get AP mode.\n" );
+        return -1;
+    }
+    printf( "AP mode = %s \n", ap_mode );
 
 
     // Work done, now close the socket.
