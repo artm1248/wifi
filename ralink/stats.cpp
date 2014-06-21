@@ -21,6 +21,13 @@ static char CFG_VALUE_AP_MODE[] = "APMode";
 static char CFG_VALUE_WIRELESS_MODE[] = "WirelessMode";
 static char CFG_VALUE_CHANNEL[] = "Channel";
 
+/* Modes of operation -for SIOCGIWMODE */
+#define IW_MODE_AUTO	0	/* Let the driver decides */
+#define IW_MODE_ADHOC	1	/* Single cell network */
+#define IW_MODE_INFRA	2	/* Multi cell network, roaming, ... */
+#define IW_MODE_MASTER	3	/* Synchronisation master or Access Point */
+#define IW_MODE_REPEAT	4	/* Wireless Repeater (forwarder) */
+#define IW_MODE_SECOND	5	/* Secondary master/repeater (backup) */
 
 int skfd; // Generic raw socket desc.
 
@@ -264,7 +271,7 @@ bool GetWifiProtocol( char protocol[] )
 
     // Fill in request for Wifi channel.
     request.u.data.pointer = protocol;
-    request.u.data.length  = sizeof( WIRELESS_MODE_LEN + 1 );
+    request.u.data.length  = WIRELESS_MODE_LEN + 1;
 
     int ret = ioctl( skfd, SIOCGIWNAME , &request );
     if( 0 > ret )
@@ -276,6 +283,49 @@ bool GetWifiProtocol( char protocol[] )
     {
         strncpy( protocol, request.u.name, IFNAMSIZ );
         printf( "GetWifiProtocol: Protocol = %s \n", protocol );
+    }
+    return true;
+}
+
+
+/** GetPhyMode.
+ *  @param mode - char buffer to store the WiFi mode (Adhoc/Infra/etc.)
+ *  @return true if successful, false otherwise.
+ *  Notes:
+ *      - Use SIOCGIWMODE (standard ioctl).
+ *      - Buffer size must be at least WIRELESS_MODE_LEN.
+ */
+bool GetPhyMode( char mode[] )
+{
+    // Declare a iwreq struct to get info from the kernel.
+    struct iwreq request = {};
+    // Assign interface name.
+    strcpy( request.ifr_name, INTF_NAME_RA0 );
+
+    // Fill in request for Wifi channel.
+    request.u.data.pointer = mode;
+    request.u.data.length  = WIRELESS_MODE_LEN + 1;
+
+    int ret = ioctl( skfd, SIOCGIWMODE , &request );
+    if( 0 > ret )
+    {
+        printf( "GetPhyMode: SIOCGIWMODE failed code %d.\n", ret );
+        return false;
+    }
+    else
+    {
+        unsigned short mode_num = request.u.mode;
+        switch( mode_num )
+        {
+            case IW_MODE_AUTO   : strncpy( mode, "auto", WIRELESS_MODE_LEN );   break;
+            case IW_MODE_ADHOC  : strncpy( mode, "adhoc", WIRELESS_MODE_LEN );  break;
+            case IW_MODE_INFRA  : strncpy( mode, "infra", WIRELESS_MODE_LEN );  break;
+            case IW_MODE_MASTER : strncpy( mode, "master", WIRELESS_MODE_LEN ); break;
+            case IW_MODE_REPEAT : strncpy( mode, "repeat", WIRELESS_MODE_LEN ); break;
+            case IW_MODE_SECOND : strncpy( mode, "second", WIRELESS_MODE_LEN ); break;
+            default: break;
+        }
+        printf( "GetPhyMode: Mode = %s \n", mode );
     }
     return true;
 }
@@ -346,13 +396,22 @@ int main()
     printf( "Wireless protocol = %s \n", protocol );
 
 
-    char ap_mode[WIRELESS_MODE_LEN + 1 ] = "";
+    char ap_mode[WIRELESS_MODE_LEN + 1] = "";
     if( !( GetAPMode( ap_mode ) ) )
     {
         printf( "Error: Failed to get AP mode.\n" );
         return -1;
     }
     printf( "AP mode = %s \n", ap_mode );
+
+
+    char mode[WIRELESS_MODE_LEN + 1] = "";
+    if( !( GetPhyMode( mode ) ) )
+    {
+        printf( "Error: Failed to get WiFi mode.\n" );
+        return -1;
+    }
+    printf( "WiFi mode = %s \n", mode );
 
 
     // Work done, now close the socket.
