@@ -1,0 +1,24 @@
+Q: What is Wext?
+A: Wireless extensions = a set of standard ioctl calls + /proc/net/wireless
+
+
+Q: What information does /proc/net/wireless provide?
+A: The entry /proc/net/wireless give statistics and information on the driver.
+
+
+Q: What are Wext ioclts used for?
+A: Ioctls are used to configure the driver and issue commands.
+
+
+Q: Where is driver API?
+A: kernel/include/net/iw_handler.h
+
+
+Q: Where is user space API and common definition?
+A: kernel/include/linux/wireless.h
+   net/core/wireless.c
+
+
+Q: Where are the events defined?
+A: kernel/include/linux/wireless.h
+   net/core/wireless.c
